@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt 
+from anytree import Node , RenderTree
 
 def generateGraph():
     G=nx.Graph() #Create Graph
@@ -45,13 +46,54 @@ def generateGraph():
     plt.savefig("resault.png") # save as png
     plt.show() # display
     
-    return(G)
+    return(G , agent)
                     
 
 def Neighbors(G,node):
     return (list(nx.neighbors(G,node)))
 
 
-graph = generateGraph()
+graph,agent = generateGraph()
 print(Neighbors(graph,'1,1'))
 
+
+class ourNode (Node):
+    def __init__(self, child , parent , lable):
+        super().__init__(child , parent=parent)
+        
+        if parent == None:
+            self.gn = 1
+        else:
+            self.gn = parent.gn + 1
+        
+        if parent != None:
+            parent_numbers = lable.split(',')
+            for i in range(len(parent_numbers)):
+                parent_numbers[i] = int(parent_numbers[i])
+
+            child_numbers = child.split(',')
+            for i in range(len(child_numbers)):
+                child_numbers[i] = int(child_numbers[i])
+
+            for i in range (len(parent_numbers)):
+                if parent_numbers[i] == child_numbers[i]:
+                    if parent_numbers[i+1]==child_numbers[i+1]:
+                        break
+                    elif parent_numbers[i+1] > child_numbers[i+1]:
+                        self.action = "LEFT"
+                        break
+                    elif parent_numbers [i+1] < child_numbers [i+1]:
+                        self.action = "RIGHT"
+                        break
+                elif parent_numbers[i] > child_numbers[i]:
+                    self.action = "UP"
+                    break
+                elif parent_numbers[i]< child_numbers[i]:
+                    self.action = "DOWN"
+                    break
+                
+
+
+test = ourNode('0,1',None,None)
+test2 = ourNode('1,1',test,'0,1')
+print(test2.action)
