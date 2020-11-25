@@ -9,7 +9,7 @@ def generateGraph():
     home = list() #Lisr fot location Homes
     numbers = ["0","1","2","3","4"]
     
-    with open("Maps/map1/map.txt" , "r") as fin:
+    with open("ui-ai991-python/Maps/map1/map.txt" , "r") as fin:
 
         for line in fin:
             maps.append(list(line.strip()))
@@ -42,7 +42,7 @@ def generateGraph():
     
     #Save picture of graph
     nx.draw(G,with_labels=True)
-    plt.savefig("test.png") # save as png
+    plt.savefig("resault.png") # save as png
     plt.show() # display
     
     return(G)
