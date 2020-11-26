@@ -1,7 +1,44 @@
 import networkx as nx
 import matplotlib.pyplot as plt 
 from anytree import Node , RenderTree
+from anytree.render import ContStyle
+from base import Action
 
+class nodeTree (Node):
+    def __init__(self, child , parent, label):
+        super().__init__(child , parent=parent)
+        
+        if parent == None:
+            self.gn = 0
+        else:
+            self.gn = parent.gn + 1
+        
+        if parent != None:
+            parent_numbers = label.split(',')
+            for i in range(len(parent_numbers)):
+                parent_numbers[i] = int(parent_numbers[i])
+
+            child_numbers = child.split(',')
+            for i in range(len(child_numbers)):
+                child_numbers[i] = int(child_numbers[i])
+
+            for i in range (len(parent_numbers)):
+                if parent_numbers[i] == child_numbers[i]:
+                    if parent_numbers[i+1]==child_numbers[i+1]:
+                        break
+                    elif parent_numbers[i+1] > child_numbers[i+1]:
+                        self.action = Action.LEFT
+                        break
+                    elif parent_numbers [i+1] < child_numbers [i+1]:
+                        self.action = Action.RIGHT
+                        break
+                elif parent_numbers[i] > child_numbers[i]:
+                    self.action = Action.UP
+                    break
+                elif parent_numbers[i]< child_numbers[i]:
+                    self.action = Action.DOWN
+                    break
+                
 def generateGraph():
     G=nx.Graph() #Create Graph
     maps = list() #List for Maps
@@ -23,7 +60,7 @@ def generateGraph():
                 elif maps[i][j] in numbers:
                     diamond.append(tuple((i,j)))
                 elif maps[i][j] == 'A':
-                    agent = tuple((i,j))
+                    agent = f"{i},{j}"
                 elif maps[i][j] == 'a':
                     home.append(tuple((i,j)))
 
@@ -48,52 +85,31 @@ def generateGraph():
     
     return(G , agent)
                     
-
 def Neighbors(G,node):
     return (list(nx.neighbors(G,node)))
 
+def root_tree (G,node):
+    root = nodeTree(node,None,None)
+    return root
+    
+def expand_tree(G,parent):
+    list_neighbors = Neighbors(G,parent.name)
+    child_nodes = list()
+    for neighbors in list_neighbors:
+        child_nodes.append(nodeTree(neighbors,parent,parent.name))
+    return child_nodes
+
+
+
 
 graph,agent = generateGraph()
-print(Neighbors(graph,'1,1'))
+# print(Neighbors(graph,'1,1'))
+root = root_tree(graph,agent)
+our_list = expand_tree(graph,root)
 
+temp = list()
 
-class ourNode (Node):
-    def __init__(self, child , parent , lable):
-        super().__init__(child , parent=parent)
-        
-        if parent == None:
-            self.gn = 1
-        else:
-            self.gn = parent.gn + 1
-        
-        if parent != None:
-            parent_numbers = lable.split(',')
-            for i in range(len(parent_numbers)):
-                parent_numbers[i] = int(parent_numbers[i])
+for item in our_list:
+    temp.append(expand_tree(graph,item))
 
-            child_numbers = child.split(',')
-            for i in range(len(child_numbers)):
-                child_numbers[i] = int(child_numbers[i])
-
-            for i in range (len(parent_numbers)):
-                if parent_numbers[i] == child_numbers[i]:
-                    if parent_numbers[i+1]==child_numbers[i+1]:
-                        break
-                    elif parent_numbers[i+1] > child_numbers[i+1]:
-                        self.action = "LEFT"
-                        break
-                    elif parent_numbers [i+1] < child_numbers [i+1]:
-                        self.action = "RIGHT"
-                        break
-                elif parent_numbers[i] > child_numbers[i]:
-                    self.action = "UP"
-                    break
-                elif parent_numbers[i]< child_numbers[i]:
-                    self.action = "DOWN"
-                    break
-                
-
-
-test = ourNode('0,1',None,None)
-test2 = ourNode('1,1',test,'0,1')
-print(test2.action)
+print(RenderTree(root,style=ContStyle()))
