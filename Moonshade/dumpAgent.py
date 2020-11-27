@@ -12,9 +12,12 @@ class DumpAgent(BaseAgent):
         # state = self.updateState(state, turn_data)
         if not self.sequence:
             problem = Graph(state.map)
+            agentx, agenty = turn_data.agent_data[0].position
+            problem.agent = f'{agentx},{agenty}'
             self.sequence = search(problem)
-            if not self.sequence:
-                return None
+            # if not self.sequence:
+            # return None
+        print(self.sequence)
         return self.sequence.pop()
 
     def updateState(self, state, percept):

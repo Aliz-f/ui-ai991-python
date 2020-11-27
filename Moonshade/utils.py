@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
 
-maps = list()  # List for Maps
-with open("Maps/map1/map.txt", "r") as fin:
-    for line in fin:
-        maps.append(list(line.strip()))
+# maps = list()  # List for Maps
+# with open("Maps/map1/map.txt", "r") as fin:
+#     for line in fin:
+#         maps.append(list(line.strip()))
 
 
 class nodeTree (Node):
@@ -52,9 +52,10 @@ class Graph(object):
         self.problem, self.agent, self.goal, self.home = generateGraph(map)
 
     def goal_test(self, node):
-        # goal = str(self.goal[0])
-        for goal in self.goal:
-            return node.name == goal
+        goal = self.goal[0]
+        x, y = goal
+        goal_string = f'{x},{y}'
+        return node.name == goal_string
 
 
 def generateGraph(map):
