@@ -5,7 +5,7 @@ from anytree import Node, RenderTree
 from anytree.render import ContStyle
 
 # maps = list()  # List for Maps
-# with open("Maps/map1/map.txt", "r") as fin:
+# with open("", "r") as fin:
 #     for line in fin:
 #         maps.append(list(line.strip()))
 
@@ -50,9 +50,14 @@ class Graph(object):
 
     def __init__(self, map):
         self.problem, self.agent, self.goal, self.home = generateGraph(map)
+        self.final = False
 
     def goal_test(self, node):
-        goal = self.goal[0]
+        goal = None
+        if self.final:
+            goal = self.home[0]
+        else:
+            goal = self.goal[0]
         x, y = goal
         goal_string = f'{x},{y}'
         return node.name == goal_string
@@ -106,6 +111,7 @@ def generateGraph(map):
 
 
 def Neighbors(G, node):
+    print(list(nx.neighbors(G, node)))
     try:
         return (list(nx.neighbors(G, node)))
     except AttributeError:
@@ -118,7 +124,7 @@ def root_tree(node):
 
 
 def expand_tree(G, parent):
-    list_neighbors = Neighbors(G, parent.name)
+    list_neighbors = Neighbors(G.problem, parent.name)
     child_nodes = list()
     for neighbors in list_neighbors:
         child_nodes.append(nodeTree(neighbors, parent, parent.name))

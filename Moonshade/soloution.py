@@ -1,5 +1,8 @@
 def recursive_soloution(node, seq):
-    seq.append(node.action)
+    try:
+        seq.append(node.action)
+    except:
+        pass
     if not node.parent:
         return seq
     else:
