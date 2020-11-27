@@ -1,11 +1,11 @@
 import networkx as nx
+from Base.base import Action
 import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
-from base import Action
 
 maps = list()  # List for Maps
-with open("ui-ai991-python/Maps/map1/map.txt", "r") as fin:
+with open("Maps/map1/map.txt", "r") as fin:
     for line in fin:
         maps.append(list(line.strip()))
 
@@ -46,12 +46,28 @@ class nodeTree (Node):
                     break
 
 
+class Graph(object):
+
+    def __init__(self, map):
+        self.problem, self.agent, self.goal, self.home = generateGraph(map)
+
+    def goal_test(self, node):
+        goal = str(self.goal[0])
+        return node.name == goal
+
+
 def generateGraph(maps):
-    G = nx.Graph()  # Create Graph
-    walls = list()  # List for locations Walls
-    diamond = list()  # List for Location diamond
-    home = list()  # Lisr fot location Homes
-    numbers = ["0", "1", "2", "3", "4"]
+    
+    G = nx.Graph()                          # Create Graph
+
+    walls = list()                          # List for locations Walls
+
+    diamond = list()                        # List for Location diamond
+
+    home = list()                           # Lisr fot location Homes
+
+    numbers = ["0", "1", "2", "3", "4"]     # List for found diamond 
+    
     # Find walls, diamond, agent, homes
     for i in range(0, len(maps)):
         for j in range(0, len(maps)):
@@ -64,6 +80,7 @@ def generateGraph(maps):
             elif maps[i][j] == 'a':
                 home.append(tuple((i, j)))
 
+
     # Add edges ==> row
     for i in range(0, len(maps)):
         for j in range(0, len(maps)):
@@ -71,12 +88,14 @@ def generateGraph(maps):
                 if j+1 < len(maps):
                     G.add_edge(f"{i},{j}", f"{i},{j+1}")
 
+
     # Add edges ==> Column
     for j in range(0, len(maps)):
         for i in range(0, len(maps)):
             if tuple((i, j)) not in walls and tuple((i+1, j)) not in walls:
                 if i+1 < len(maps):
                     G.add_edge(f"{i},{j}", f"{i+1},{j}")
+
 
     # Save picture of graph
     nx.draw(G, with_labels=True)
@@ -103,25 +122,26 @@ def expand_tree(G, parent):
     return child_nodes
 
 
-class Graph(object):
 
-    def __init__(self, map):
-        self.problem, self.agent, self.goal, self.home = generateGraph(map)
+#*********************test****************************
 
-    def goal_test(self, node):
-        goal = str(self.goal[0])
-        return node.name == goal
+#Create Graph
+graph, agent, diamond, home = generateGraph(maps)
 
+#Print Neighbors of '1,1' node
+print(Neighbors(graph,'1,1'))
 
-# graph, agent, diamond, home = generateGraph(maps)
+#Create Root Tree
+root = root_tree(agent)
 
-# # print(Neighbors(graph,'1,1'))
-# root = root_tree(graph, agent)
-# our_list = expand_tree(graph, root)
+#Expand Tree for root
+our_list = expand_tree(graph, root)
 
-# temp = list()
+#Show expand tree
+tree = list()
+for item in our_list:
+    tree.append(expand_tree(graph,item))
 
-# for item in our_list:
-#     temp.append(expand_tree(graph, item))
+print (RenderTree(root,style=ContStyle))
 
-# print(RenderTree(root, style=ContStyle()))
+#*************************************************

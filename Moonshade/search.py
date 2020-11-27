@@ -1,8 +1,6 @@
 import itertools
-
 from utils import *
 from soloution import soloution
-
 
 def recursive_dls(node, problem, limit):
     if problem.goal_test(node):
@@ -17,11 +15,9 @@ def recursive_dls(node, problem, limit):
                 return result
         return None
 
-
 def depth_limited_search(node, problem, limit):
     root_node = root_tree(node)
     return recursive_dls(root_node, problem, limit)
-
 
 def search(problem):
     for depth in itertools.count(start=0):
