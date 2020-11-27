@@ -5,18 +5,18 @@ from base import BaseAgent
 
 class DumpAgent(BaseAgent):
 
+    sequence = list()
     def do_turn(self, turn_data):
-        sequence = []
         state = turn_data
         # state = self.updateState(state, turn_data)
-        if not sequence:
+        if not self.sequence:
             problem = Graph(state.map)
-            sequence = search(problem)
-            if not sequence:
+            self.sequence = search(problem)
+            if not self.sequence:
                 return None
-            return sequence.pop()
+            return self.sequence.pop()
 
-    def updateState(self, state, percept: TurnData):
+    def updateState(self, state, percept):
         if percept.turns_left == 0:
             pass
         else:
