@@ -4,10 +4,10 @@ from anytree import Node, RenderTree
 from anytree.render import ContStyle
 from base import Action
 
-maps = list()  # List for Maps
-with open("ui-ai991-python/Maps/map1/map.txt", "r") as fin:
-    for line in fin:
-        maps.append(list(line.strip()))
+# maps = list()  # List for Maps
+# with open("ui-ai991-python/Maps/map1/map.txt", "r") as fin:
+#     for line in fin:
+#         maps.append(list(line.strip()))
 
 
 class nodeTree (Node):
@@ -48,9 +48,9 @@ class nodeTree (Node):
 
 def generateGraph(maps):
     G = nx.Graph()  # Create Graph
-    walls = list()  # List for locations Walls
-    diamond = list()  # List for Location diamond
-    home = list()  # Lisr fot location Homes
+    walls = list()  # List for wall locations
+    diamond = list()  # List for diamond Location
+    home = list()  # Lisr fot Homes location
     numbers = ["0", "1", "2", "3", "4"]
     # Find walls, diamond, agent, homes
     for i in range(0, len(maps)):
