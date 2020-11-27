@@ -52,26 +52,23 @@ class Graph(object):
         self.problem, self.agent, self.goal, self.home = generateGraph(map)
 
     def goal_test(self, node):
-        goal = str(self.goal[0])
-        return node.name == goal
+        # goal = str(self.goal[0])
+        for goal in self.goal:
+            return node.name == goal
 
 
 def generateGraph(map):
 
-   G = nx.Graph()                          # Create Graph
+    G = nx.Graph()  # Create Graph
+    walls = list()  # List for locations Walls
+    diamond = list()  # List for Location diamond
+    home = list()  # Lisr fot location Homes
+    numbers = ["0", "1", "2", "3", "4"]  # List for found diamond
+    maps = list()
+    agent = None
 
-   walls = list()                          # List for locations Walls
-
-   diamond = list()                        # List for Location diamond
-
-   home = list()                           # Lisr fot location Homes
-
-   numbers = ["0", "1", "2", "3", "4"]     # List for found diamond
-
-   maps = list()
-
-   for item in map:
-       maps.append(list(item))
+    for item in map:
+        maps.append(list(item))
 
     # Find walls, diamond, agent, homes
     for i in range(0, len(maps)):
@@ -85,30 +82,33 @@ def generateGraph(map):
             elif maps[i][j] == 'a':
                 home.append(tuple((i, j)))
 
-    # Add edges ==> row
-    for i in range(0, len(maps)):
-        for j in range(0, len(maps)):
-            if tuple((i, j)) not in walls and tuple((i, j+1)) not in walls:
-                if j+1 < len(maps):
-                    G.add_edge(f"{i},{j}", f"{i},{j+1}")
-
-    # Add edges ==> Column
-    for j in range(0, len(maps)):
+        # Add edges ==> row
         for i in range(0, len(maps)):
-            if tuple((i, j)) not in walls and tuple((i+1, j)) not in walls:
-                if i+1 < len(maps):
-                    G.add_edge(f"{i},{j}", f"{i+1},{j}")
+            for j in range(0, len(maps)):
+                if tuple((i, j)) not in walls and tuple((i, j+1)) not in walls:
+                    if j+1 < len(maps):
+                        G.add_edge(f"{i},{j}", f"{i},{j+1}")
 
-    # Save picture of graph
-    nx.draw(G, with_labels=True)
-    plt.savefig("resault.png")  # save as png
-    plt.show()  # display
+        # Add edges ==> Column
+        for j in range(0, len(maps)):
+            for i in range(0, len(maps)):
+                if tuple((i, j)) not in walls and tuple((i+1, j)) not in walls:
+                    if i+1 < len(maps):
+                        G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
-    return(G, agent, diamond, home)
+        # Save picture of graph
+        # nx.draw(G, with_labels=True)
+        # plt.savefig("resault.png")  # save as png
+        # plt.show()  # display
+
+        return(G, agent, diamond, home)
 
 
 def Neighbors(G, node):
-    return (list(nx.neighbors(G, node)))
+    try:
+        return (list(nx.neighbors(G, node)))
+    except AttributeError:
+        return []
 
 
 def root_tree(node):
@@ -126,22 +126,22 @@ def expand_tree(G, parent):
 
 # *********************test****************************
 # Create Graph
-graph, agent, diamond, home = generateGraph(maps)
+# graph, agent, diamond, home = generateGraph(maps)
 
-# Print Neighbors of '1,1' node
-print(Neighbors(graph, '1,1'))
+# # Print Neighbors of '1,1' node
+# print(Neighbors(graph, '1,1'))
 
-# Create Root Tree
-root = root_tree(agent)
+# # Create Root Tree
+# root = root_tree(agent)
 
-# Expand Tree for root
-our_list = expand_tree(graph, root)
+# # Expand Tree for root
+# our_list = expand_tree(graph, root)
 
-# Show expand tree
-tree = list()
-for item in our_list:
-    tree.append(expand_tree(graph, item))
+# # Show expand tree
+# tree = list()
+# for item in our_list:
+#     tree.append(expand_tree(graph, item))
 
-print (RenderTree(root, style=ContStyle))
+# print(RenderTree(root, style=ContStyle))
 
 # *************************************************
