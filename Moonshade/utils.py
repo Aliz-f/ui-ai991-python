@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
 
-# maps = list()  # List for Maps
-# with open("ui-ai991-python/Maps/map1/map.txt", "r") as fin:
-#     for line in fin:
-#         maps.append(list(line.strip()))
+maps = list()  # List for Maps
+with open("Maps/map1/map.txt", "r") as fin:
+    for line in fin:
+        maps.append(list(line.strip()))
 
 
 class nodeTree (Node):
@@ -82,26 +82,26 @@ def generateGraph(map):
             elif maps[i][j] == 'a':
                 home.append(tuple((i, j)))
 
-        # Add edges ==> row
-        for i in range(0, len(maps)):
-            for j in range(0, len(maps)):
-                if tuple((i, j)) not in walls and tuple((i, j+1)) not in walls:
-                    if j+1 < len(maps):
-                        G.add_edge(f"{i},{j}", f"{i},{j+1}")
-
-        # Add edges ==> Column
+    # Add edges ==> row
+    for i in range(0, len(maps)):
         for j in range(0, len(maps)):
-            for i in range(0, len(maps)):
-                if tuple((i, j)) not in walls and tuple((i+1, j)) not in walls:
-                    if i+1 < len(maps):
-                        G.add_edge(f"{i},{j}", f"{i+1},{j}")
+            if tuple((i, j)) not in walls and tuple((i, j+1)) not in walls:
+                if j+1 < len(maps):
+                    G.add_edge(f"{i},{j}", f"{i},{j+1}")
 
-        # Save picture of graph
-        # nx.draw(G, with_labels=True)
-        # plt.savefig("resault.png")  # save as png
-        # plt.show()  # display
+    # Add edges ==> Column
+    for j in range(0, len(maps)):
+        for i in range(0, len(maps)):
+            if tuple((i, j)) not in walls and tuple((i+1, j)) not in walls:
+                if i+1 < len(maps):
+                    G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
-        return(G, agent, diamond, home)
+    # Save picture of graph
+    nx.draw(G, with_labels=True)
+    plt.savefig("res.png")  # save as png
+    plt.show()  # display
+
+    return(G, agent, diamond, home)
 
 
 def Neighbors(G, node):
