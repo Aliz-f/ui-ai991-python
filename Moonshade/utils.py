@@ -58,26 +58,16 @@ class Graph(object):
 
 def generateGraph(maps):
 
-
-<< << << < HEAD: utils.py
-   G = nx.Graph()  # Create Graph
-    walls = list()  # List for wall locations
-    diamond = list()  # List for diamond Location
-    home = list()  # Lisr fot Homes location
-    numbers = ["0", "1", "2", "3", "4"]
-== == == =
-
    G = nx.Graph()                          # Create Graph
 
-    walls = list()                          # List for locations Walls
+   walls = list()                          # List for locations Walls
 
-    diamond = list()                        # List for Location diamond
+   diamond = list()                        # List for Location diamond
 
-    home = list()                           # Lisr fot location Homes
+   home = list()                           # Lisr fot location Homes
 
-    numbers = ["0", "1", "2", "3", "4"]     # List for found diamond
+   numbers = ["0", "1", "2", "3", "4"]     # List for found diamond
 
->>>>>> > 90685e73ef86dc665056b0d95528ac138c77401f: Moonshade/utils.py
    # Find walls, diamond, agent, homes
    for i in range(0, len(maps)):
         for j in range(0, len(maps)):
