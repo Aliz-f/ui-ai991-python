@@ -1,6 +1,6 @@
 from utils import Graph
 from search import search
-from base import BaseAgent, Action
+from Base.base import BaseAgent
 
 
 class DumpAgent(BaseAgent):

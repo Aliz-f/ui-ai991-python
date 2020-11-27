@@ -1,8 +1,8 @@
 import networkx as nx
+from Base.base import Action
 import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
-from base import Action
 
 # maps = list()  # List for Maps
 # with open("ui-ai991-python/Maps/map1/map.txt", "r") as fin:
@@ -46,14 +46,40 @@ class nodeTree (Node):
                     break
 
 
+class Graph(object):
+
+    def __init__(self, map):
+        self.problem, self.agent, self.goal, self.home = generateGraph(map)
+
+    def goal_test(self, node):
+        goal = str(self.goal[0])
+        return node.name == goal
+
+
 def generateGraph(maps):
-    G = nx.Graph()  # Create Graph
+
+
+<< << << < HEAD: utils.py
+   G = nx.Graph()  # Create Graph
     walls = list()  # List for wall locations
     diamond = list()  # List for diamond Location
     home = list()  # Lisr fot Homes location
     numbers = ["0", "1", "2", "3", "4"]
-    # Find walls, diamond, agent, homes
-    for i in range(0, len(maps)):
+== == == =
+
+   G = nx.Graph()                          # Create Graph
+
+    walls = list()                          # List for locations Walls
+
+    diamond = list()                        # List for Location diamond
+
+    home = list()                           # Lisr fot location Homes
+
+    numbers = ["0", "1", "2", "3", "4"]     # List for found diamond
+
+>>>>>> > 90685e73ef86dc665056b0d95528ac138c77401f: Moonshade/utils.py
+   # Find walls, diamond, agent, homes
+   for i in range(0, len(maps)):
         for j in range(0, len(maps)):
             if maps[i][j] == '*':
                 walls.append(tuple((i, j)))
@@ -103,25 +129,24 @@ def expand_tree(G, parent):
     return child_nodes
 
 
-class Graph(object):
+# *********************test****************************
+# Create Graph
+graph, agent, diamond, home = generateGraph(maps)
 
-    def __init__(self, map):
-        self.problem, self.agent, self.goal, self.home = generateGraph(map)
+# Print Neighbors of '1,1' node
+print(Neighbors(graph, '1,1'))
 
-    def goal_test(self, node):
-        goal = str(self.goal[0])
-        return node.name == goal
+# Create Root Tree
+root = root_tree(agent)
 
+# Expand Tree for root
+our_list = expand_tree(graph, root)
 
-# graph, agent, diamond, home = generateGraph(maps)
+# Show expand tree
+tree = list()
+for item in our_list:
+    tree.append(expand_tree(graph, item))
 
-# # print(Neighbors(graph,'1,1'))
-# root = root_tree(graph, agent)
-# our_list = expand_tree(graph, root)
+print (RenderTree(root, style=ContStyle))
 
-# temp = list()
-
-# for item in our_list:
-#     temp.append(expand_tree(graph, item))
-
-# print(RenderTree(root, style=ContStyle()))
+# *************************************************
