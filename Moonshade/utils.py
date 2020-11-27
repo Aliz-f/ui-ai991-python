@@ -97,9 +97,9 @@ def generateGraph(map):
                         G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
         # Save picture of graph
-        # nx.draw(G, with_labels=True)
-        # plt.savefig("resault.png")  # save as png
-        # plt.show()  # display
+        nx.draw(G, with_labels=True)
+        plt.savefig("res.png")  # save as png
+        plt.show()  # display
 
         return(G, agent, diamond, home)
 

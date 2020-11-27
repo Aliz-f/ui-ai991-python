@@ -15,7 +15,7 @@ class DumpAgent(BaseAgent):
             self.sequence = search(problem)
             if not self.sequence:
                 return None
-            return self.sequence.pop()
+        return self.sequence.pop()
 
     def updateState(self, state, percept):
         if percept.turns_left == 0:
