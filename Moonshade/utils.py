@@ -58,32 +58,27 @@ class Graph(object):
 
 def generateGraph(map):
 
-   G = nx.Graph()                          # Create Graph
-
-   walls = list()                          # List for locations Walls
-
-   diamond = list()                        # List for Location diamond
-
-   home = list()                           # Lisr fot location Homes
-
-   numbers = ["0", "1", "2", "3", "4"]     # List for found diamond
-   
+   G = nx.Graph()# Create Graph
+   walls = list()# List for locations Walls
+   diamond = list()# List for Location diamond
+   home = list()# Lisr fot location Homes
+   numbers = ["0", "1", "2", "3", "4"] # List for found diamond
    maps = list()
    
    for item in map:
-       maps.append(list(item))
-    
+    maps.append(list(item))
+
    # Find walls, diamond, agent, homes
    for i in range(0, len(maps)):
-        for j in range(0, len(maps)):
-            if maps[i][j] == '*':
-                walls.append(tuple((i, j)))
-            elif maps[i][j] in numbers:
-                diamond.append(tuple((i, j)))
-            elif maps[i][j] == 'A':
-                agent = f"{i},{j}"
-            elif maps[i][j] == 'a':
-                home.append(tuple((i, j)))
+    for j in range(0, len(maps)):
+        if maps[i][j] == '*':
+            walls.append(tuple((i, j)))
+        elif maps[i][j] in numbers:
+            diamond.append(tuple((i, j)))
+        elif maps[i][j] == 'A':
+            agent = f"{i},{j}"
+        elif maps[i][j] == 'a':
+            home.append(tuple((i, j)))
 
     # Add edges ==> row
     for i in range(0, len(maps)):
