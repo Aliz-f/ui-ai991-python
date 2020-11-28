@@ -3,18 +3,18 @@ from Base.base import Action
 import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
-from queue import PriorityQueue
 from math import sqrt
 
 
 class nodeTree (Node):
-    def __init__(self, child, parent, label):
+    def __init__(self, child, parent, label, heuristic):
         super().__init__(child, parent=parent)
-
+        self.hn = heuristic
         if parent == None:
             self.gn = 0
         else:
             self.gn = parent.gn + 1
+        self.fn = self.hn + self.gn
 
         if parent != None:
             parent_numbers = label.split(',')
@@ -42,6 +42,9 @@ class nodeTree (Node):
                     self.action = Action.DOWN
                     break
 
+    def __cmp__(self, other):
+        return cmp(self.fn, other.fn)
+
 
 class Graph(object):
 
@@ -58,6 +61,23 @@ class Graph(object):
         x, y = goal
         goal_string = f'{x},{y}'
         return node.name == goal_string
+
+
+class PriorityQueue:
+    pq = list()
+
+    def __repr__(self):
+        return self.pq
+
+    def insert(self, node):
+        self.pq.append(node)
+        self.pq.sort()
+
+    def pop(self):
+        return self.pq.pop()
+
+    def has_item(self, node):
+        return node in self.pq
 
 
 def generateGraph(map):
@@ -120,18 +140,19 @@ def root_tree(node):
     return root
 
 
-def expand_tree(G, parent):
+def expand_tree(G, parent, h_list):
     list_neighbors = Neighbors(G.graph, parent.name)
     child_nodes = list()
     for neighbors in list_neighbors:
-        child_nodes.append(nodeTree(neighbors, parent, parent.name))
+        child_nodes.append(
+            nodeTree(neighbors, parent, parent.name, h_list[parent.name]))
     return child_nodes
 
 
 def heuristic(node, problem):
     temp = 0
     h = 0
-    node_x, node_y = tuple([int(num) for num in node.name.split(',')])
+    node_x, node_y = tuple([int(num) for num in node.split(',')])
     if not problem.final:
         for diamond in problem.goal:
             diamond_x, diamond_y = diamond
@@ -140,7 +161,7 @@ def heuristic(node, problem):
                 h = temp
     else:
         for home in problem.home:
-            home_x, home_y = home:
+            home_x, home_y = home
             temp = sqrt((node_x - home_x)**2 + (node_y - home_y)**2)
             if temp >= h:
                 h = temp
@@ -150,4 +171,5 @@ def heuristic(node, problem):
 def heuristic_list(problem):
     heuristics = {}
     for node in problem.graph:
-        heuristics[node]: heuristic(node, problem)
+        heuristics[node] = heuristic(node, problem)
+    return heuristics
