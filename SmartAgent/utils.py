@@ -142,16 +142,16 @@ def generateGraph(map):
 
 
 def Neighbors(G, node):
-    print(list(nx.neighbors(G, node)))
+    # print(list(nx.neighbors(G, node)))
     try:
         return (list(nx.neighbors(G, node)))
     except AttributeError:
         return []
 
 
-def root_tree(node):
-    root = nodeTree(node, None, None)
-    return root
+# def root_tree(node):
+#     root = nodeTree(node, None, None)
+#     return root
 
 
 def expand_tree(G, parent, h_list):

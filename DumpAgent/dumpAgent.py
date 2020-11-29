@@ -11,7 +11,7 @@ class DumpAgent(BaseAgent):
     def do_turn(self, turn_data) -> Action:
         state = turn_data
         # state = self.updateState(state, turn_data)
-        if not self.sequence0 and self.sequence1:
+        if not self.sequence0 and not self.sequence1:
             problem = Graph(state.map)
             if not state.agent_data[0].carrying:
                 agentx, agenty = turn_data.agent_data[0].position

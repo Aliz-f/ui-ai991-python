@@ -53,14 +53,14 @@ class Graph(object):
         self.final = False
 
     def goal_test(self, node):
-        goal = None
-        if self.final:
-            goal = self.home[0]
-        else:
-            goal = self.goal[0]
-        x, y = goal
-        goal_string = f'{x},{y}'
-        return node.name == goal_string
+            node_tuple = tuple([int(num) for num in node.name.split(',')])
+            if self.final:
+                if node_tuple in self.home:
+                    return True
+            else:
+                if node_tuple in self.goal:
+                    return True
+            return False
 
 
 def generateGraph(map):
