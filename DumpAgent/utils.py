@@ -3,11 +3,23 @@ from Base.base import Action
 import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
-
+import abc
 # maps = list()  # List for Maps
 # with open("", "r") as fin:
 #     for line in fin:
 #         maps.append(list(line.strip()))
+
+
+class Counting:
+    count = 0
+
+    @classmethod
+    def increment_count(self):
+        self.count += 1
+
+    @classmethod
+    def get_count(self):
+        return self.count
 
 
 class nodeTree (Node):
@@ -103,15 +115,14 @@ def generateGraph(map):
                     G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
     # Save picture of graph
-    nx.draw(G, with_labels=True)
-    plt.savefig("res.png")  # save as png
-    plt.show()  # display
+    #nx.draw(G, with_labels=True)
+    # plt.savefig("res.png")  # save as png
+    # plt.show()  # display
 
     return(G, agent, diamond, home)
 
 
 def Neighbors(G, node):
-    print(list(nx.neighbors(G, node)))
     try:
         return (list(nx.neighbors(G, node)))
     except AttributeError:
@@ -124,6 +135,7 @@ def root_tree(node):
 
 
 def expand_tree(G, parent):
+    Counting.increment_count()
     list_neighbors = Neighbors(G.problem, parent.name)
     child_nodes = list()
     for neighbors in list_neighbors:

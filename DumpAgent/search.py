@@ -5,6 +5,7 @@ from soloution import soloution
 
 def recursive_dls(node, problem, limit):
     if problem.goal_test(node):
+        print(f'the total nodes expanded: {Counting.get_count()}')
         return soloution(node)
     elif limit == 0:
         return
