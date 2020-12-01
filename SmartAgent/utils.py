@@ -133,7 +133,7 @@ def generateGraph(map):
                 if i+1 < len(maps):
                     G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
-    # Save picture of graph
+    # # Save picture of graph
     # nx.draw(G, with_labels=True)
     # plt.savefig("res.png")  # save as png
     # plt.show()  # display
@@ -149,9 +149,9 @@ def Neighbors(G, node):
         return []
 
 
-def root_tree(node):
-    root = nodeTree(node, None, None)
-    return root
+# def root_tree(node):
+#     root = nodeTree(node, None, None)
+#     return root
 
 
 def expand_tree(G, parent, h_list):

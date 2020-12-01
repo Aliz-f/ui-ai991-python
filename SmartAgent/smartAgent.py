@@ -21,6 +21,7 @@ class SmartAgent(BaseAgent):
                 problem.final = True
                 heuristics = heuristic_list(problem)
                 self.sequence1 = graph_search(problem, heuristics)
+
         if self.sequence0:
             return self.sequence0.pop()
         elif self.sequence1:
