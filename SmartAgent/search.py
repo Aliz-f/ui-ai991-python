@@ -11,7 +11,7 @@ def graph_search(problem, heuristics):
     while frontier:
         node = frontier.pop()
         if problem.goal_test(node):
-            print(count)
+            print(f'the total nodes expanded: {count}')
             return soloution(node)
         explored.append(node)
         count += 1
