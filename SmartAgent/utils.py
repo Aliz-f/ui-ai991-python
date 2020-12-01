@@ -134,15 +134,15 @@ def generateGraph(map):
                     G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
     # Save picture of graph
-    nx.draw(G, with_labels=True)
-    plt.savefig("res.png")  # save as png
-    plt.show()  # display
+    # nx.draw(G, with_labels=True)
+    # plt.savefig("res.png")  # save as png
+    # plt.show()  # display
 
     return(G, agent, diamond, home)
 
 
 def Neighbors(G, node):
-    print(list(nx.neighbors(G, node)))
+    # print(list(nx.neighbors(G, node)))
     try:
         return (list(nx.neighbors(G, node)))
     except AttributeError:
