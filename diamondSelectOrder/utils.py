@@ -6,11 +6,6 @@ from anytree.render import ContStyle
 import copy
 import math
 
-# maps = list()  # List for Maps
-# with open("", "r") as fin:
-#     for line in fin:
-#         maps.append(list(line.strip()))
-
 
 class nodeTree (Node):
     def __init__(self, child, parent, label):
@@ -70,14 +65,15 @@ class MetaGraph(Graph):
         super().__init__(map)
         self._meta_graph = nx.DiGraph()
         self._generate_meta_graph(self.goal)
+        self.diamond_order = self.goal
 
     def _generate_meta_graph(self, daimond_list):
         initial_state = []
         self._meta_graph.add_node(str(initial_state))
         self._add_edge_recursively(initial_state, daimond_list)
         # Save picture of graph
-        nx.draw(self._meta_graph, with_labels=True)
-        plt.savefig("./res.png")  # save as png
+        # nx.draw(self._meta_graph, with_labels=True)
+        # plt.savefig("./res.png")  # save as png
         # plt.show()  # display
         # intial_state = []
         # base_x, base_y = self.home[0]
@@ -105,15 +101,12 @@ class MetaGraph(Graph):
 
             self._meta_graph.add_edge(str(state), str(
                 current_state), cost=edge_cost)
-            # print(state)
-            # print(current_state)
             self._add_edge_recursively(current_state, new_diamond_list)
 
     def _calculate_cost(self, first_state, second_state):
         cost = 0
         state_x, state_y, _ = first_state
         c_x_state, c_y_state, __ = second_state
-
         closest_base_length = 100
         closest_base_x, closest_base_y = None, None
         for base in self.home:
@@ -130,6 +123,22 @@ class MetaGraph(Graph):
             c_x_state - closest_base_x) + math.fabs(c_y_state + closest_base_y)
         cost = cost_to_base + cost_from_base
         return cost
+
+    def set_order(self, state):
+        if len(self.diamond_order) == len(state):
+            self.diamond_order = state
+        else:
+            goal_collected_score = 0
+            for target in self.diamond_order:
+                _1, _2, score = target
+                goal_collected_score += score
+
+            state_collected_score = 0
+            for target in state:
+                _1, _2, score = target
+                state_collected_score += score
+            if state_collected_score > goal_collected_score:
+                self.diamond_order = state
 
 
 def generateGraph(map):
@@ -181,15 +190,10 @@ def generateGraph(map):
                 if i+1 < len(maps):
                     G.add_edge(f"{i},{j}", f"{i+1},{j}")
 
-
-# nx.draw(G, with_labels=True)
-# plt.savefig("res.png")  # save as png
-# plt.show()  # display
     return(G, agent, diamond, home)
 
 
 def Neighbors(G, node):
-    # print(list(nx.neighbors(G, node)))
     try:
         return (list(nx.neighbors(G, node)))
     except AttributeError:
@@ -207,26 +211,3 @@ def expand_tree(G, parent):
     for neighbors in list_neighbors:
         child_nodes.append(nodeTree(neighbors, parent, parent.name))
     return child_nodes
-
-
-# *********************test****************************
-# Create Graph
-# graph, agent, diamond, home = generateGraph(maps)
-
-# # Print Neighbors of '1,1' node
-# print(Neighbors(graph, '1,1'))
-
-# # Create Root Tree
-# root = root_tree(agent)
-
-# # Expand Tree for root
-# our_list = expand_tree(graph, root)
-
-# # Show expand tree
-# tree = list()
-# for item in our_list:
-#     tree.append(expand_tree(graph, item))
-
-# print(RenderTree(root, style=ContStyle))
-
-# *************************************************
