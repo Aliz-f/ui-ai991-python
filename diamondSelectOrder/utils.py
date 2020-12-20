@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from anytree import Node, RenderTree
 from anytree.render import ContStyle
 import copy
+import math
 
 # maps = list()  # List for Maps
 # with open("", "r") as fin:
@@ -77,12 +78,17 @@ class MetaGraph(Graph):
         # Save picture of graph
         nx.draw(self._meta_graph, with_labels=True)
         plt.savefig("./res.png")  # save as png
-        plt.show()  # display
-        intial_state = []
-        all_paths = nx.all_shortest_paths(self._meta_graph, str(
-            initial_state), str([(1, 4, 5), (4, 1, 10), (4, 4, 2)]))
-        for item in all_paths:
-            print(item)
+        # plt.show()  # display
+        # intial_state = []
+        # base_x, base_y = self.home[0]
+
+        shortest_path_length = nx.dijkstra_path_length(
+            self._meta_graph, str(initial_state), str(daimond_list), weight="cost")
+        print(shortest_path_length)
+        # for item in all_paths:
+        # print(item)
+        # for node in self._meta_graph.nodes:
+        # print(node)
 
     def _add_edge_recursively(self, state, daimond_list):
         for i in range(len(daimond_list)):
@@ -90,7 +96,18 @@ class MetaGraph(Graph):
             item = new_diamond_list.pop(i)
             current_state = state.copy()
             current_state.append(item)
-            self._meta_graph.add_edge(str(state), str(current_state))
+            try:
+                state_x, state_y, _ = state[len(state) - 1]
+            except IndexError:
+                agent_x, agent_y = tuple(self.agent.split(','))
+                state_x, state_y = int(agent_x), int(agent_y)
+            c_x_state, c_y_state, __ = item
+            edge_weight = (math.fabs(state_x - c_x_state)) + \
+                (math.fabs(state_y - c_y_state))
+            self._meta_graph.add_edge(str(state), str(
+                current_state), cost=edge_weight)
+            # print(state)
+            # print(current_state)
             self._add_edge_recursively(current_state, new_diamond_list)
 
 
@@ -100,7 +117,6 @@ def generateGraph(map):
     walls = list()  # List for locations Walls
     diamond = list()  # List for Location diamond
     home = list()  # Lisr fot location Homes
-    numbers = ["0", "1", "2", "3", "4"]  # List for found diamond
     maps = list()
     agent = None
 
