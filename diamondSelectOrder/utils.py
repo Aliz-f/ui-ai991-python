@@ -97,18 +97,39 @@ class MetaGraph(Graph):
             current_state = state.copy()
             current_state.append(item)
             try:
-                state_x, state_y, _ = state[len(state) - 1]
+                edge_cost = self._calculate_cost(state[len(state) - 1], item)
             except IndexError:
                 agent_x, agent_y = tuple(self.agent.split(','))
                 state_x, state_y = int(agent_x), int(agent_y)
-            c_x_state, c_y_state, __ = item
-            edge_weight = (math.fabs(state_x - c_x_state)) + \
-                (math.fabs(state_y - c_y_state))
+                edge_cost = self._calculate_cost((state_x, state_y, 0), item)
+
             self._meta_graph.add_edge(str(state), str(
-                current_state), cost=edge_weight)
+                current_state), cost=edge_cost)
             # print(state)
             # print(current_state)
             self._add_edge_recursively(current_state, new_diamond_list)
+
+    def _calculate_cost(self, first_state, second_state):
+        cost = 0
+        state_x, state_y, _ = first_state
+        c_x_state, c_y_state, __ = second_state
+
+        closest_base_length = 100
+        closest_base_x, closest_base_y = None, None
+        for base in self.home:
+            base_x, base_y = base
+            to_base_length = math.fabs(state_x - base_x) + \
+                math.fabs(state_y - base_y)
+            if to_base_length <= closest_base_length:
+                closest_base_length = to_base_length
+                closest_base_x, closest_base_y = base
+
+        cost_to_base = math.fabs(state_x - closest_base_x) + \
+            math.fabs(state_y - closest_base_y)
+        cost_from_base = math.fabs(
+            c_x_state - closest_base_x) + math.fabs(c_y_state + closest_base_y)
+        cost = cost_to_base + cost_from_base
+        return cost
 
 
 def generateGraph(map):
