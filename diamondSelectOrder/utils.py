@@ -5,6 +5,7 @@ from anytree import Node, RenderTree
 from anytree.render import ContStyle
 import copy
 import math
+import re
 
 
 class nodeTree (Node):
@@ -130,6 +131,7 @@ class MetaGraph(Graph):
         return False
 
     def set_order(self, state):
+        state = self._string_to_list(state)
         if len(self.diamond_order) == len(state):
             self.diamond_order = state
         else:
@@ -147,9 +149,33 @@ class MetaGraph(Graph):
 
         return self.diamond_order
 
+    def _string_to_list(self, string):
+        pattern = r'([1-9]+, [1-9]+, [1-9]+)'
+        regex = re.compile(pattern)
+        result = regex.findall(string)
+        string_list = [res.split(',') for res in result]
+        new_list = []
+        for item in string_list:
+            new_list.append((int(item[0]), int(item[1]), int(item[2])))
+
+        return new_list
+
     def get_cost(self, first_state, second_state):
         data = self._meta_graph.get_edge_data(first_state, second_state)
         return data
+
+    def goal_test(self, node):
+        node_tuple = tuple([int(num) for num in node.name.split(',')])
+        if self.final:
+            if node_tuple in self.home:
+                return True
+        else:
+            goal_state = self.diamond_order[len(self.diamond_order) - 1]
+            goal_x, goal_y, _ = goal_state
+            goal_place = f'{goal_x},{goal_y}'
+            if node.name == goal_place:
+                return True
+        return False
 
 
 class MetaNode(Node):
