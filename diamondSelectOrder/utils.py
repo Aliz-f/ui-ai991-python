@@ -124,6 +124,11 @@ class MetaGraph(Graph):
         cost = cost_to_base + cost_from_base
         return cost
 
+    def meta_goal_test(self, state):
+        if len(state.name) == len(str(self.goal)):
+            return True
+        return False
+
     def set_order(self, state):
         if len(self.diamond_order) == len(state):
             self.diamond_order = state
@@ -139,6 +144,18 @@ class MetaGraph(Graph):
                 state_collected_score += score
             if state_collected_score > goal_collected_score:
                 self.diamond_order = state
+
+        return self.diamond_order
+
+    def get_cost(self, first_state, second_state):
+        data = self._meta_graph.get_edge_data(first_state, second_state)
+        return data
+
+
+class MetaNode(Node):
+    def __init__(self, graph, node, parent):
+        super().__init__(node, parent=parent)
+        self.g = graph.get_cost(node, parent)
 
 
 def generateGraph(map):
@@ -210,4 +227,12 @@ def expand_tree(G, parent):
     child_nodes = list()
     for neighbors in list_neighbors:
         child_nodes.append(nodeTree(neighbors, parent, parent.name))
+    return child_nodes
+
+
+def expand_meta_graph(graph, node):
+    list_neighbors = Neighbors(graph, node.name)
+    child_nodes = list()
+    for neighbors in list_neighbors:
+        child_nodes.append(MetaNode(graph, neighbors, node.name))
     return child_nodes
