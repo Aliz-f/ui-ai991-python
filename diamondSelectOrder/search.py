@@ -6,18 +6,20 @@ import itertools
 
 
 def meta_graph_search(problem, max_turns):
-    node = MetaNode(problem, [], None)
+    node = MetaNode(problem, '[]', None)
     frontier = Queue()
     frontier.put(node)
     while frontier:
         node = frontier.get()
+        max_turns -= node.g
         if problem.meta_goal_test(node):
+            if max_turns > 0:
+                problem.set_order(node.name)
             return problem.set_order(node.name)
         children = expand_meta_graph(problem, node)
         for child in children:
-            if max_turns - child.g > 0:
+            if max_turns > 0:
                 frontier.put(child)
-                max_turns -= child.g
             elif not frontier.empty():
                 problem.set_order(child.name)
             else:

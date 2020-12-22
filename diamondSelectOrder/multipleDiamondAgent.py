@@ -13,14 +13,14 @@ class MultipleDiamondAgent(BaseAgent):
         if not self.sequence0 and not self.sequence1:
             meta_problem = MetaGraph(state.map)
             meta_problem.goal_list = meta_graph_search(
-                meta_problem._meta_graph, state.turns_left)
-            if not state.agent_data[0].carrying:
+                meta_problem, state.turns_left)
+            if turn_data.agent_data[0].carrying is None:
                 meta_problem.agent = f'{agent_x},{agent_y}'
-                self.sequence0 = search(meta_problem.problem)
+                self.sequence0 = search(meta_problem)
             else:
                 meta_problem.agent = f'{agent_x},{agent_y}'
                 meta_problem.final = True
-                self.sequence1 = search(meta_problem.problem)
+                self.sequence1 = search(meta_problem)
 
         if self.sequence0:
             return self.sequence0.pop()

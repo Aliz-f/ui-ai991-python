@@ -66,7 +66,8 @@ class MetaGraph(Graph):
         super().__init__(map)
         self._meta_graph = nx.DiGraph()
         self._generate_meta_graph(self.goal)
-        self.diamond_order = self.goal
+        self.diamond_order = [(0, 0, 0)]
+        self.final = False
 
     def _generate_meta_graph(self, daimond_list):
         initial_state = []
@@ -96,9 +97,10 @@ class MetaGraph(Graph):
             try:
                 edge_cost = self._calculate_cost(state[len(state) - 1], item)
             except IndexError:
-                agent_x, agent_y = tuple(self.agent.split(','))
-                state_x, state_y = int(agent_x), int(agent_y)
-                edge_cost = self._calculate_cost((state_x, state_y, 0), item)
+                edge_cost = 0
+                # agent_x, agent_y = tuple(self.agent.split(','))
+                # state_x, state_y = int(agent_x), int(agent_y)
+                # edge_cost = self._calculate_cost((state_x, state_y, 0), item)
 
             self._meta_graph.add_edge(str(state), str(
                 current_state), cost=edge_cost)
@@ -133,6 +135,7 @@ class MetaGraph(Graph):
     def set_order(self, state):
         state = self._string_to_list(state)
         if len(self.diamond_order) == len(state):
+            state.sort(key=self._sort_key)
             self.diamond_order = state
         else:
             goal_collected_score = 0
@@ -145,12 +148,13 @@ class MetaGraph(Graph):
                 _1, _2, score = target
                 state_collected_score += score
             if state_collected_score > goal_collected_score:
+                state.sort(key=self._sort_key)
                 self.diamond_order = state
 
         return self.diamond_order
 
     def _string_to_list(self, string):
-        pattern = r'([1-9]+, [1-9]+, [1-9]+)'
+        pattern = r'\d+, \d+, \d+'
         regex = re.compile(pattern)
         result = regex.findall(string)
         string_list = [res.split(',') for res in result]
@@ -160,20 +164,28 @@ class MetaGraph(Graph):
 
         return new_list
 
-    def get_cost(self, first_state, second_state):
-        data = self._meta_graph.get_edge_data(first_state, second_state)
-        return data
+    def _sort_key(self, node):
+        _, __, score = node
+        return score
+
+    def get_cost(self, child_state, parent_state):
+        data = self._meta_graph.get_edge_data(parent_state, child_state)
+        return data['cost']
 
     def goal_test(self, node):
-        node_tuple = tuple([int(num) for num in node.name.split(',')])
         if self.final:
-            if node_tuple in self.home:
-                return True
+            for base in self.home:
+                x, y = base
+                goal = f'{x},{y}'
+                if node.name == goal:
+                    self.final = False
+                    return True
         else:
-            goal_state = self.diamond_order[len(self.diamond_order) - 1]
-            goal_x, goal_y, _ = goal_state
-            goal_place = f'{goal_x},{goal_y}'
-            if node.name == goal_place:
+            x, y, _ = self.diamond_order[len(self.diamond_order) - 1]
+            diamond = f'{x},{y}'
+            if node.name == diamond:
+                self.diamond_order.pop()
+                self.final = True
                 return True
         return False
 
@@ -181,7 +193,10 @@ class MetaGraph(Graph):
 class MetaNode(Node):
     def __init__(self, graph, node, parent):
         super().__init__(node, parent=parent)
-        self.g = graph.get_cost(node, parent)
+        if parent:
+            self.g = graph.get_cost(node, parent.name)
+        else:
+            self.g = 0
 
 
 def generateGraph(map):
@@ -238,7 +253,7 @@ def generateGraph(map):
 
 def Neighbors(G, node):
     try:
-        return (list(nx.neighbors(G, node)))
+        return (list(nx.neighbors(G, str(node))))
     except AttributeError:
         return []
 
@@ -257,8 +272,8 @@ def expand_tree(G, parent):
 
 
 def expand_meta_graph(graph, node):
-    list_neighbors = Neighbors(graph, node.name)
+    list_neighbors = Neighbors(graph._meta_graph, node.name)
     child_nodes = list()
     for neighbors in list_neighbors:
-        child_nodes.append(MetaNode(graph, neighbors, node.name))
+        child_nodes.append(MetaNode(graph, neighbors, node))
     return child_nodes
