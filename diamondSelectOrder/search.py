@@ -6,6 +6,11 @@ import itertools
 
 
 def meta_graph_search(problem, max_turns):
+    '''
+    bredth first search to find diamond order
+    in this function the best order of diamonds will be returned
+    rather than the first found goal.
+    '''
     node = MetaNode(problem, '[]', None)
     frontier = Queue()
     frontier.put(node)
@@ -27,6 +32,10 @@ def meta_graph_search(problem, max_turns):
 
 
 def recursive_dls(node, problem, limit):
+    '''
+    the main function of depth limited search.
+    it is implemented recursively and it will return a sequence of Actions
+    '''
     if problem.goal_test(node):
         return soloution(node)
     elif limit == 0:
@@ -41,11 +50,17 @@ def recursive_dls(node, problem, limit):
 
 
 def depth_limited_search(node, problem, limit):
+    '''
+    the higher order component which controls depth limit
+    '''
     root_node = root_tree(node)
     return recursive_dls(root_node, problem, limit)
 
 
 def search(problem):
+    '''
+    the starting point for depth limited search with constant increment of depth limit
+    '''
     for depth in itertools.count(start=0):
         result = depth_limited_search(problem.agent, problem, depth)
         if result:
