@@ -11,7 +11,7 @@ def meta_graph_search(problem, max_turns):
     frontier.put(node)
     while frontier:
         node = frontier.get()
-        max_turns -= node.g
+        max_turns -= (node.g + 3)
         if problem.meta_goal_test(node):
             if max_turns > 0:
                 problem.set_order(node.name)

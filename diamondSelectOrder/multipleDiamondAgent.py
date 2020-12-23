@@ -11,7 +11,7 @@ class MultipleDiamondAgent(BaseAgent):
         state = turn_data
         agent_x, agent_y = state.agent_data[0].position
         if not self.sequence0 and not self.sequence1:
-            meta_problem = MetaGraph(state.map)
+            meta_problem = MetaGraph(state)
             meta_problem.goal_list = meta_graph_search(
                 meta_problem, state.turns_left)
             if turn_data.agent_data[0].carrying is None:

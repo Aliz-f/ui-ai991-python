@@ -62,9 +62,10 @@ class Graph(object):
 
 
 class MetaGraph(Graph):
-    def __init__(self, map):
-        super().__init__(map)
+    def __init__(self, state):
+        super().__init__(state.map)
         self._meta_graph = nx.DiGraph()
+        self.agent = state.agent_data[0].position
         self._generate_meta_graph(self.goal)
         self.diamond_order = [(0, 0, 0)]
         self.final = False
@@ -97,10 +98,9 @@ class MetaGraph(Graph):
             try:
                 edge_cost = self._calculate_cost(state[len(state) - 1], item)
             except IndexError:
-                edge_cost = 0
-                # agent_x, agent_y = tuple(self.agent.split(','))
-                # state_x, state_y = int(agent_x), int(agent_y)
-                # edge_cost = self._calculate_cost((state_x, state_y, 0), item)
+                # edge_cost = 0
+                agent_x, agent_y = self.agent
+                edge_cost = self._calculate_cost((agent_x, agent_y, 0), item)
 
             self._meta_graph.add_edge(str(state), str(
                 current_state), cost=edge_cost)
@@ -123,7 +123,7 @@ class MetaGraph(Graph):
         cost_to_base = math.fabs(state_x - closest_base_x) + \
             math.fabs(state_y - closest_base_y)
         cost_from_base = math.fabs(
-            c_x_state - closest_base_x) + math.fabs(c_y_state + closest_base_y)
+            c_x_state - closest_base_x) + math.fabs(c_y_state - closest_base_y)
         cost = cost_to_base + cost_from_base
         return cost
 
