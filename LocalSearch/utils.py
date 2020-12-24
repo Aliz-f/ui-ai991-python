@@ -2,6 +2,7 @@ from os import pathsep
 import networkx as nx
 import matplotlib.pyplot as plt
 import itertools as it
+from random import randint
 
 
 class DiamondMiner(object):
@@ -22,7 +23,7 @@ class DiamondMiner(object):
         points_collected = 0
 
         # creating a permutation of this diamond order
-        permutation = it.permutations(diamondScores)
+        permutation = it.permutations(self.diamond_score)
 
         # path to achive this permutation
         path = whichDiamond(self.problem, self.agent, permutation,
@@ -47,6 +48,19 @@ class DiamondMiner(object):
             'cost': path_cost,
             'score': points_collected
         }
+
+    def goal_test(self, node):
+        path = self.best_path['path']
+        if node.name == path[0]:
+            path.pop(0)
+            return True
+        return False
+
+    def _create_permutation(self):
+        num = randint(0, 1)
+        p_swap = 0
+        p_reversion = 0
+        p_insertion = 0
 
 
 def generateProblem(map):
