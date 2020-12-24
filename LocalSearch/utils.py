@@ -16,7 +16,7 @@ class DiamondMiner(object):
             state.map)
         self.agent = state.agent_data[0].position
 
-    def create_random_soloution(self, turns_left, walk):
+    def create_random_soloution(self, turns_left, walk=0):
         path_cost = 0
         diamond_order = []
         points_collected = 0
