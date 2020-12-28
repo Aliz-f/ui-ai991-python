@@ -20,6 +20,9 @@ class DiamondMiner(object):
         self.agent = state.agent_data[0].position
         self.best_path = None
         self.goal_path = None
+        print('agent is: ', self.agent)
+        print('diamonds are:', self.diamond_score)
+        print('bases are : ', self.bases)
 
     def create_random_soloution(self, turns_left, initial=False, sol=None, walk=0):
         path_cost = 0
@@ -205,21 +208,21 @@ def do_reverse(sol):
     first_num = int(randint(0, len(sol) - 1))
     second_num = int(randint(0, len(sol) - 1))
 
-    # making sure that first_number is not equal to second_number
-    while first_num == second_num or first_num - second_num == 2:
-        second_num = int(randint(0, len(sol) - 1))
-
     # making sure that the first index is lesser than the second index
     if first_num > second_num:
         temp = first_num
         first_num = second_num
         second_num = temp
 
+    # making sure that first_number is not equal to second_number
+    while first_num == second_num or first_num - second_num == -1:
+        second_num = int(randint(0, len(sol) - 1))
+
     # reversing the chosen slice and recreating the sol
     reversed_particle = sol[first_num:second_num]
     reversed_particle.reverse()
     before_reversed_particle = sol[:first_num]
-    after_reversed_particle = sol[:second_num]
+    after_reversed_particle = sol[second_num:]
     return before_reversed_particle + reversed_particle + after_reversed_particle
 
 
@@ -268,7 +271,7 @@ def generateProblem(map):
                 walls.append(tuple((i, j)))
 
             # * Find diamonds and diamondScores
-            elif maps[i][j] in numbers:
+            elif maps[i][j].isdigit():
 
                 diamond.append(tuple((i, j)))
 
@@ -444,17 +447,6 @@ def whichHome(graph, diamond_pos, homes):
                 homePath = path
 
     return homePath
-
-
-with open('map4/map.txt', 'r') as fin:
-    problem, agent, diamonds, diamondScores, homes = generateProblem(fin)
-
-
-with open('result-map.txt', 'w') as fin:
-    order = diamondOrder(problem, agent, diamondScores, homes)
-    for key in order:
-        fin.writelines(f"{order[key]}\n\n")
-    # fin.writelines(f'{order}\n')
 
 
 def Neighbors(G, node):

@@ -2,7 +2,7 @@ from math import exp
 from random import randint
 
 
-def local_search(problem, turns_left, initial_temp=7, main_iteration=10, sub_iteration=8, alpha=0.8):
+def local_search(problem, turns_left, initial_temp=20, main_iteration=10, sub_iteration=12, alpha=0.6):
     '''
     local search using Simulated Anealing algorithm
     a new permutation is created in each iteration
@@ -21,7 +21,7 @@ def local_search(problem, turns_left, initial_temp=7, main_iteration=10, sub_ite
         for j in range(sub_iteration):
             next_soloution = problem.create_random_soloution(
                 turns_left, sol=current_soloution)
-            delta = delta_E(current_soloution, next_soloution)
+            delta = delta_E(current_soloution, next_soloution, turns_left)
             if delta <= 0:
                 current_soloution = next_soloution
             else:
@@ -41,11 +41,13 @@ def local_search(problem, turns_left, initial_temp=7, main_iteration=10, sub_ite
     return best_soloution
 
 
-def delta_E(first_order, second_order):
+def delta_E(first_order, second_order, turns_left):
     '''
     the function which calculates the delta between cost
     of the two orders plus their collected scores
     '''
-    first_value = first_order['score'] + first_order['cost']
-    second_value = second_order['score'] + second_order['cost']
+    first_value = first_order['score'] + \
+        (turns_left/10 - first_order['cost']/10)
+    second_value = second_order['score'] + \
+        (turns_left/10 - second_order['cost']/10)
     return first_value - second_value
