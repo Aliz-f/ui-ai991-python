@@ -18,7 +18,9 @@ def recursive_dls(node, problem, limit):
 
 
 def depth_limited_search(node, problem, limit):
-    root_node = root_tree(node)
+    agent_x, agent_y = node
+    node_string = f'{agent_x},{agent_y}'
+    root_node = root_tree(node_string)
     return recursive_dls(root_node, problem, limit)
 
 

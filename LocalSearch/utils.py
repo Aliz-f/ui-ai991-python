@@ -1,8 +1,10 @@
 from os import pathsep
 import networkx as nx
+from anytree import Node
 import matplotlib.pyplot as plt
 import itertools as it
 from random import randint
+from Base.base import Action
 
 
 class DiamondMiner(object):
@@ -16,18 +18,31 @@ class DiamondMiner(object):
         self.problem, self.agent, self.diamonds, self.diamond_score, self.bases = generateProblem(
             state.map)
         self.agent = state.agent_data[0].position
+        self.best_path = None
+        self.goal_path = None
 
-    def create_random_soloution(self, turns_left, walk=0):
+    def create_random_soloution(self, turns_left, initial=False, sol=None, walk=0):
         path_cost = 0
         diamond_order = []
         points_collected = 0
 
         # creating a permutation of this diamond order
-        permutation = it.permutations(self.diamond_score)
+        if initial:
+            permutations = it.permutations(self.diamond_score)
 
-        # path to achive this permutation
-        path = whichDiamond(self.problem, self.agent, permutation,
-                            self.bases, turns_left, walk)
+            # path to achive this permutation
+            perms = list(permutations)
+            permutation = perms[0]
+            path = whichDiamond(self.problem, self.agent, permutation,
+                                self.bases, turns_left, walk)
+        else:
+            if not sol:
+                raise "no Soloution sent"
+
+            new_sol = self._format_to_list(sol)
+            permutation = self._create_permutation(new_sol)
+            path = whichDiamond(self.problem, self.agent, permutation,
+                                self.bases, turns_left, walk)
 
         for each_path in path:
             path_cost += len(each_path)
@@ -50,17 +65,182 @@ class DiamondMiner(object):
         }
 
     def goal_test(self, node):
-        path = self.best_path['path']
-        if node.name == path[0]:
-            path.pop(0)
+        if not self.goal_path:
+            self._generate_goal_path()
+        if node.name == self.goal_path[0]:
+            self.goal_path.pop(0)
             return True
         return False
 
-    def _create_permutation(self):
+    def soloution(self):
+        sequence = []
+        self._generate_goal_path()
+        agent_x, agent_y = self.agent
+        while self.goal_path:
+            goal_string = self.goal_path.pop(0)
+            goal = [int(x) for x in goal_string.split(',')]
+            if goal[0] == agent_x and goal[1] - agent_y == 1:
+                sequence.append(Action.RIGHT)
+            elif goal[0] == agent_x and goal[1] - agent_y == -1:
+                sequence.append(Action.LEFT)
+            elif goal[0] - agent_x == 1 and goal[1] == agent_y:
+                sequence.append(Action.DOWN)
+            elif goal[0] - agent_x == -1 and goal[1] == agent_y:
+                sequence.append(Action.UP)
+            agent_x, agent_y = goal[0], goal[1]
+        sequence.reverse()
+        return sequence
+
+    def _generate_goal_path(self):
+        path = self.best_path['path']
+        self.goal_path = path[0] + path[1]
+
+    def _create_permutation(self, current_soloution):
+        '''
+        the method wich creates a permutation
+        by either swapping two indices
+        or reversing from one index to another
+        or by inserting the first index after the second index
+        with possibility
+        '''
+
+        # creating a random number
         num = randint(0, 1)
-        p_swap = 0
-        p_reversion = 0
-        p_insertion = 0
+
+        # swapp possibility
+        p_swap = 0.6
+
+        # reversion possibility
+        p_reversion = 0.1
+
+        # insertion possibility
+        p_insertion = 0.3
+
+        # deciding what to happen in either case of num:
+        if num < p_reversion:
+            return do_reverse(current_soloution)
+        elif num > p_reversion and num < p_insertion:
+            return do_insert(current_soloution)
+        else:
+            return do_swap(current_soloution)
+
+    def _format_to_list(self, sol_dict):
+        '''
+        it gets a dict soloution which has path, order and cost keys
+        and creates a list of dicts in order specified according to order key
+        each dict in the new list has diamond name position and score
+        '''
+        diamond_order = sol_dict['order']
+        list_sol = []
+        for diamond in diamond_order:
+            for element in self.diamond_score:
+                if element['name'] == diamond:
+                    list_sol.append(element)
+        return list_sol
+
+
+class nodeTree (Node):
+    def __init__(self, child, parent, label):
+        super().__init__(child, parent=parent)
+
+        if parent == None:
+            self.gn = 0
+        else:
+            self.gn = parent.gn + 1
+
+        if parent != None:
+            parent_numbers = label.split(',')
+            for i in range(len(parent_numbers)):
+                parent_numbers[i] = int(parent_numbers[i])
+
+            child_numbers = child.split(',')
+            for i in range(len(child_numbers)):
+                child_numbers[i] = int(child_numbers[i])
+
+            for i in range(len(parent_numbers)):
+                if parent_numbers[i] == child_numbers[i]:
+                    if parent_numbers[i+1] == child_numbers[i+1]:
+                        break
+                    elif parent_numbers[i+1] > child_numbers[i+1]:
+                        self.action = Action.LEFT
+                        break
+                    elif parent_numbers[i+1] < child_numbers[i+1]:
+                        self.action = Action.RIGHT
+                        break
+                elif parent_numbers[i] > child_numbers[i]:
+                    self.action = Action.UP
+                    break
+                elif parent_numbers[i] < child_numbers[i]:
+                    self.action = Action.DOWN
+                    break
+
+
+def do_swap(sol):
+    '''
+    swapping two indeices randomly
+    '''
+
+    # chose two indices form the array
+    first_num = int(randint(0, len(sol) - 1))
+    second_num = int(randint(0, len(sol) - 1))
+
+    # making sure that first_number is not equal to second_number
+    while first_num == second_num:
+        second_num = int(randint(0, len(sol) - 1))
+
+    # swap the values of the two indices
+    temp = sol[first_num]
+    sol[first_num] = sol[second_num]
+    sol[second_num] = temp
+    return sol
+
+
+def do_reverse(sol):
+    '''
+    reversing from the first randomly generated index
+     to the secomd randomly generated index
+    '''
+
+    # chose two indices form the array
+    first_num = int(randint(0, len(sol) - 1))
+    second_num = int(randint(0, len(sol) - 1))
+
+    # making sure that first_number is not equal to second_number
+    while first_num == second_num or first_num - second_num == 2:
+        second_num = int(randint(0, len(sol) - 1))
+
+    # making sure that the first index is lesser than the second index
+    if first_num > second_num:
+        temp = first_num
+        first_num = second_num
+        second_num = temp
+
+    # reversing the chosen slice and recreating the sol
+    reversed_particle = sol[first_num:second_num]
+    reversed_particle.reverse()
+    before_reversed_particle = sol[:first_num]
+    after_reversed_particle = sol[:second_num]
+    return before_reversed_particle + reversed_particle + after_reversed_particle
+
+
+def do_insert(sol):
+    '''
+    inserts the first randomly chosen index
+    after the second randomly chosen index
+    '''
+
+    # chose two indices form the array
+    first_num = int(randint(0, len(sol) - 1))
+    second_num = int(randint(0, len(sol) - 1))
+
+    # making sure that first_number is not equal to second_number
+    while first_num == second_num:
+        second_num = int(randint(0, len(sol) - 1))
+
+    # do the insertion
+    element = sol.pop(second_num)
+    sol.insert(first_num, element)
+    return sol
 
 
 def generateProblem(map):
@@ -207,6 +387,9 @@ def whichDiamond(graph, agent, permutation, homes, turns, walk):
 
     paths = list()  # * Return final path
     each_diamond = list()  # * To save path for each diamond (with home)
+    if isinstance(agent, tuple):
+        agent_x, agent_y = agent
+        agent = f'{agent_x},{agent_y}'
 
     for i in range(len(permutation)):
 
@@ -272,3 +455,24 @@ with open('result-map.txt', 'w') as fin:
     for key in order:
         fin.writelines(f"{order[key]}\n\n")
     # fin.writelines(f'{order}\n')
+
+
+def Neighbors(G, node):
+    # print(list(nx.neighbors(G, node)))
+    try:
+        return (list(nx.neighbors(G, node)))
+    except AttributeError:
+        return []
+
+
+def root_tree(node):
+    root = nodeTree(node, None, None)
+    return root
+
+
+def expand_tree(G, parent):
+    list_neighbors = Neighbors(G.problem, parent.name)
+    child_nodes = list()
+    for neighbors in list_neighbors:
+        child_nodes.append(nodeTree(neighbors, parent, parent.name))
+    return child_nodes

@@ -13,12 +13,14 @@ def local_search(problem, turns_left, initial_temp=7, main_iteration=10, sub_ite
     and difference between the two permutation value
     '''
     temp = initial_temp
-    current_soloution = problem.create_random_soloution(turns_left)
+    current_soloution = problem.create_random_soloution(
+        turns_left, initial=True)
     best_soloution = current_soloution
 
-    for i in main_iteration:
-        for j in sub_iteration:
-            next_soloution = problem.create_random_soloution(turns_left)
+    for i in range(main_iteration):
+        for j in range(sub_iteration):
+            next_soloution = problem.create_random_soloution(
+                turns_left, sol=current_soloution)
             delta = delta_E(current_soloution, next_soloution)
             if delta <= 0:
                 current_soloution = next_soloution

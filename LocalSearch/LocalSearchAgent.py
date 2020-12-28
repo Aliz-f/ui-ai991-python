@@ -12,6 +12,8 @@ class LocalSearchAgent(BaseAgent):
         if not self.sequence:
             problem = DiamondMiner(state)
             problem.best_path = local_search(problem, state.turns_left)
-            self.sequence = search(problem)
-        else:
+            print(problem.best_path)
+            self.sequence = problem.soloution()
+            print(self.sequence)
+        if self.sequence:
             return self.sequence.pop()
