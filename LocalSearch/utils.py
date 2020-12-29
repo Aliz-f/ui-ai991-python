@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import itertools as it
 from random import randint
 from Base.base import Action
+from math import fabs
 
 
 class DiamondMiner(object):
@@ -96,7 +97,11 @@ class DiamondMiner(object):
 
     def _generate_goal_path(self):
         path = self.best_path['path']
-        self.goal_path = path[0] + path[1]
+        for p in path:
+            if not self.goal_path:
+                self.goal_path = p
+                continue
+            self.goal_path += p
 
     def _create_permutation(self, current_soloution):
         '''
@@ -106,7 +111,8 @@ class DiamondMiner(object):
         or by inserting the first index after the second index
         with possibility
         '''
-
+        if len(self.diamond_score) == 1:
+            return current_soloution
         # creating a random number
         num = randint(0, 1)
 
@@ -205,18 +211,18 @@ def do_reverse(sol):
     '''
 
     # chose two indices form the array
-    first_num = int(randint(0, len(sol) - 1))
-    second_num = int(randint(0, len(sol) - 1))
+    first_num = int(randint(0, len(sol) - 2))
+    second_num = int(randint(first_num, len(sol) - 1))
 
     # making sure that the first index is lesser than the second index
-    if first_num > second_num:
-        temp = first_num
-        first_num = second_num
-        second_num = temp
 
     # making sure that first_number is not equal to second_number
-    while first_num == second_num or first_num - second_num == -1:
-        second_num = int(randint(0, len(sol) - 1))
+    while first_num == second_num:
+        second_num = int(randint(first_num, len(sol) - 1))
+        # if first_num > second_num:
+        #     temp = first_num
+        #     first_num = second_num
+        #     second_num = temp
 
     # reversing the chosen slice and recreating the sol
     reversed_particle = sol[first_num:second_num]
@@ -419,12 +425,12 @@ def whichDiamond(graph, agent, permutation, homes, turns, walk):
 
         # * Check if our walk more than turns left ==> return last path
         walk += len(each_diamond)
-        if walk > turns:
-            return paths
-        else:
-            # each list in paths shows one diamond in home
-            paths.append(each_diamond)
-            each_diamond = []
+        # if walk > turns:
+        #     return paths
+        # else:
+        # each list in paths shows one diamond in home
+        paths.append(each_diamond)
+        each_diamond = []
 
     return (paths)
 
