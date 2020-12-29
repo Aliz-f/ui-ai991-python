@@ -2,7 +2,7 @@ from math import exp
 from random import randint
 
 
-def local_search(problem, turns_left, initial_temp=20, main_iteration=12, sub_iteration=9, alpha=0.6):
+def local_search(problem, turns_left, initial_temp=20, main_iteration=20, sub_iteration=15, alpha=0.6):
     '''
     local search using Simulated Anealing algorithm
     a new permutation is created in each iteration

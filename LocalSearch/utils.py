@@ -37,20 +37,20 @@ class DiamondMiner(object):
             # path to achive this permutation
             perms = list(permutations)
             permutation = perms[0]
-            path , points_collected = whichDiamond(self.problem, self.agent, permutation,
-                                self.bases, turns_left, walk)
+            path, points_collected, path_cost = whichDiamond(self.problem, self.agent, permutation,
+                                                             self.bases, turns_left, walk)
         else:
             if not sol:
                 raise "no Soloution sent"
 
             new_sol = self._format_to_list(sol)
             permutation = self._create_permutation(new_sol)
-            path, points_collected = whichDiamond(self.problem, self.agent, permutation,
-                                self.bases, turns_left, walk)
+            path, points_collected, path_cost = whichDiamond(self.problem, self.agent, permutation,
+                                                             self.bases, turns_left, walk)
 
-        for each_path in path:
-            path_cost += len(each_path)
-        
+        # for each_path in path:
+        #     path_cost += len(each_path)
+
         for diamonds in permutation:
             diamond_order.append(diamonds.get('name'))
 
@@ -137,8 +137,11 @@ class DiamondMiner(object):
         for diamond in diamond_order:
             for element in self.diamond_score:
                 if element['name'] == diamond:
-                    list_sol.append(element)
+                    if element not in list_sol:
+                        list_sol.append(element)
+                        break
         return list_sol
+
 
 class nodeTree (Node):
     def __init__(self, child, parent, label):
@@ -175,6 +178,7 @@ class nodeTree (Node):
                     self.action = Action.DOWN
                     break
 
+
 def do_swap(sol):
     '''
     swapping two indeices randomly
@@ -193,6 +197,7 @@ def do_swap(sol):
     sol[first_num] = sol[second_num]
     sol[second_num] = temp
     return sol
+
 
 def do_reverse(sol):
     '''
@@ -221,6 +226,7 @@ def do_reverse(sol):
     after_reversed_particle = sol[second_num:]
     return before_reversed_particle + reversed_particle + after_reversed_particle
 
+
 def do_insert(sol):
     '''
     inserts the first randomly chosen index
@@ -239,6 +245,7 @@ def do_insert(sol):
     element = sol.pop(second_num)
     sol.insert(first_num, element)
     return sol
+
 
 def generateProblem(map):
 
@@ -329,6 +336,7 @@ def generateProblem(map):
 
     return(problem, agent, diamond, diamondSocre, home)
 
+
 def diamondOrder(problem, agent, diamondScores, homes):
 
     diamond_order = list()  # * To Save order of diamond for each path
@@ -378,12 +386,14 @@ def diamondOrder(problem, agent, diamondScores, homes):
 
     return (paths)
 
+
 def whichDiamond(graph, agent, permutation, homes, turns, walk):
 
     paths = list()  # * Return final path
     each_diamond = list()  # * To save path for each diamond (with home)
     pointsCollected = 0
-    
+    path_cost = 0
+
     if isinstance(agent, tuple):
         agent_x, agent_y = agent
         agent = f'{agent_x},{agent_y}'
@@ -414,17 +424,26 @@ def whichDiamond(graph, agent, permutation, homes, turns, walk):
         # * Check if our walk more than turns left ==> return last path
         walk += len(each_diamond)
         if walk > turns:
+            step_taken = 0
+            pointsCollected = 0
+            path_cost = 0
             length_path = len(paths)
             i = 0
             for diamonds in permutation:
-                pointsCollected += diamonds.get('score')
+                step_taken += len(paths[i])
+                if step_taken <= turns:
+                    pointsCollected += diamonds.get('score')
                 i += 1
                 if i == length_path:
                     break
+            for each_path in paths:
+                path_cost += len(each_path)
             paths.append(each_diamond)
-            
+
         else:
-            #each list in paths shows one diamond in home
+            # each list in paths shows one diamond in home
+            pointsCollected = 0
+            path_cost = 0
             paths.append(each_diamond)
             length_path = len(paths)
             i = 0
@@ -433,10 +452,13 @@ def whichDiamond(graph, agent, permutation, homes, turns, walk):
                 i += 1
                 if i == length_path:
                     break
-            
+            for each_path in paths:
+                path_cost += len(each_path)
+
             each_diamond = []
 
-    return (paths, pointsCollected)
+    return (paths, pointsCollected, path_cost)
+
 
 def whichHome(graph, diamond_pos, homes):
     homePaths = list()  # * All path to all homes in the map
@@ -457,6 +479,7 @@ def whichHome(graph, diamond_pos, homes):
 
     return homePath
 
+
 def Neighbors(G, node):
     # print(list(nx.neighbors(G, node)))
     try:
@@ -464,9 +487,11 @@ def Neighbors(G, node):
     except AttributeError:
         return []
 
+
 def root_tree(node):
     root = nodeTree(node, None, None)
     return root
+
 
 def expand_tree(G, parent):
     list_neighbors = Neighbors(G.problem, parent.name)
