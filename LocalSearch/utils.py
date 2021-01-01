@@ -21,9 +21,7 @@ class DiamondMiner(object):
         self.agent = state.agent_data[0].position
         self.best_path = None
         self.goal_path = None
-        print('agent is: ', self.agent)
-        print('diamonds are:', self.diamond_score)
-        print('bases are : ', self.bases)
+        
 
     def create_random_soloution(self, turns_left, initial=False, sol=None, walk=0):
         path_cost = 0
